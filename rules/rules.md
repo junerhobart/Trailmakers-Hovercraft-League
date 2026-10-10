@@ -13,6 +13,7 @@
 
 ## Gameplay
 
+- [Match flow](gameplay/match-flow.md)
 - [Ball control](gameplay/ball-control.md)
 - [Respawning and resets](gameplay/respawning.md)
 

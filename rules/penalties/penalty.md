@@ -1,3 +1,3 @@
 # Penalty
 
-Another player gets to ram you and/or fire one bullet of their choice.
+Penalties are administered by the league mod. Follow the mod's instructions before play resumes.
