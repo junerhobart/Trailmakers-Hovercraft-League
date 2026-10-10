@@ -25,7 +25,6 @@ jobs:
           BEFORE: ${{ github.event.before }}
           AFTER: ${{ github.sha }}
           REPOSITORY: ${{ github.repository }}
-          REPOSITORY_OWNER: ${{ github.repository_owner }}
           SERVER_URL: ${{ github.server_url }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
@@ -47,19 +46,20 @@ jobs:
 
           if [[ -z "$diff" ]]; then
             diff="No textual changes."
-          elif (( ${#diff} > 1400 )); then
-            diff="${diff:0:1375}"$'\n… diff truncated'
+          elif (( ${#diff} > 3600 )); then
+            diff="${diff:0:3575}"$'\n… diff truncated'
           fi
 
           commit_title="${commit_title:0:120}"
-          repository_name="${REPOSITORY#*/}"
           commit_url="$SERVER_URL/$REPOSITORY/commit/$message_sha"
-          website_url="https://$REPOSITORY_OWNER.github.io/$repository_name/"
-          message="Rules updated: $commit_title"$'\n'"Commit: <$commit_url>"$'\n'"Website: <$website_url>"$'\n\n```diff\n'"$diff"$'\n```'
+          short_sha="${message_sha:0:7}"
+          description="$commit_title"$'\n\n```diff\n'"$diff"$'\n```'
 
           payload="$(jq -n \
-            --arg content "$message" \
-            '{content: $content, flags: 4, allowed_mentions: {parse: []}}')"
+            --arg title "Commit $short_sha" \
+            --arg url "$commit_url" \
+            --arg description "$description" \
+            '{embeds: [{title: $title, url: $url, description: $description}], allowed_mentions: {parse: []}}')"
 
           curl --fail --silent --show-error \
             --header "Content-Type: application/json" \
