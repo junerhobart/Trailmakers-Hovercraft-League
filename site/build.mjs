@@ -4,7 +4,7 @@ import { fileURLToPath } from "node:url";
 
 const siteDirectory = path.dirname(fileURLToPath(import.meta.url));
 const projectDirectory = path.resolve(siteDirectory, "..");
-const rulesDirectory = path.join(projectDirectory, "rules", "soccer");
+const rulesDirectory = path.join(projectDirectory, "rules");
 const outputDirectory = path.resolve(projectDirectory, process.argv[2] ?? "dist");
 
 const escapeHtml = (value) => value
@@ -61,7 +61,7 @@ function renderMarkdown(markdown) {
   return output.join("\n");
 }
 
-const categoryOrder = ["gameplay", "weapons", "penalties"];
+const categoryOrder = ["build", "gameplay", "weapons", "penalties"];
 const entries = await readdir(rulesDirectory, { withFileTypes: true });
 const categories = entries
   .filter((entry) => entry.isDirectory())

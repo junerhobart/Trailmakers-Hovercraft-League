@@ -16,6 +16,5 @@ Weapons marked with `^` count as small variants and allow **2 per slot**.
 - Mini Grenade Launcher ^
 - EMP Launcher
 - Short Range EMP Launcher
-- Rocket Launcher
 - Large Cannon
 - Anchor Pins ^

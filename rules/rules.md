@@ -1,5 +1,9 @@
 # Soccer Rules
 
+## Build
+
+- [Build limits](build/limits.md)
+
 ## Weapons
 
 - [General weapon rules](weapons/rules.md)
