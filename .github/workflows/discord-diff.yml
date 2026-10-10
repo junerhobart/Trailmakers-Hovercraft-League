@@ -32,12 +32,15 @@ jobs:
           set -euo pipefail
 
           if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
-            commit_title="Example rule update"
-            diff=$'diff --git a/rules/template.md b/rules/template.md\n--- a/rules/template.md\n+++ b/rules/template.md\n@@ -1,3 +1,3 @@\n # Example rule\n-Old rule text\n+Updated rule text'
+            message_sha="$(git log -1 --format=%H -- rules/)"
+            commit_title="$(git log -1 --format=%s "$message_sha")"
+            diff="$(git show --format= --unified=1 "$message_sha" -- rules/ || true)"
           elif [[ "$BEFORE" == "0000000000000000000000000000000000000000" ]]; then
+            message_sha="$AFTER"
             commit_title="$(git log -1 --format=%s "$AFTER")"
             diff="$(git show --format= --unified=1 "$AFTER" -- rules/ || true)"
           else
+            message_sha="$AFTER"
             commit_title="$(git log -1 --format=%s "$AFTER")"
             diff="$(git diff --unified=1 "$BEFORE" "$AFTER" -- rules/ || true)"
           fi
@@ -50,13 +53,13 @@ jobs:
 
           commit_title="${commit_title:0:120}"
           repository_name="${REPOSITORY#*/}"
-          commit_url="$SERVER_URL/$REPOSITORY/commit/$AFTER"
+          commit_url="$SERVER_URL/$REPOSITORY/commit/$message_sha"
           website_url="https://$REPOSITORY_OWNER.github.io/$repository_name/"
-          message="Rules updated: $commit_title"$'\n'"Commit: $commit_url"$'\n'"Website: $website_url"$'\n\n```diff\n'"$diff"$'\n```'
+          message="Rules updated: $commit_title"$'\n'"Commit: <$commit_url>"$'\n'"Website: <$website_url>"$'\n\n```diff\n'"$diff"$'\n```'
 
           payload="$(jq -n \
             --arg content "$message" \
-            '{content: $content, allowed_mentions: {parse: []}}')"
+            '{content: $content, flags: 4, allowed_mentions: {parse: []}}')"
 
           curl --fail --silent --show-error \
             --header "Content-Type: application/json" \
