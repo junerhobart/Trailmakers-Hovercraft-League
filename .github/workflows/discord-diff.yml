@@ -1,0 +1,46 @@
+name: Send diff to Discord
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Send diff
+        env:
+          BEFORE: ${{ github.event.before }}
+          AFTER: ${{ github.sha }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          set -euo pipefail
+
+          if [[ "$BEFORE" == "0000000000000000000000000000000000000000" ]]; then
+            diff="$(git show --format= --unified=1 "$AFTER" || true)"
+          else
+            diff="$(git diff --unified=1 "$BEFORE" "$AFTER" || true)"
+          fi
+
+          if [[ -z "$diff" ]]; then
+            diff="No textual changes."
+          elif (( ${#diff} > 1750 )); then
+            diff="${diff:0:1725}"$'\n… diff truncated'
+          fi
+
+          payload="$(jq -n \
+            --arg content $'```diff\n'"$diff"$'\n```' \
+            '{content: $content, allowed_mentions: {parse: []}}')"
+
+          curl --fail --silent --show-error \
+            --header "Content-Type: application/json" \
+            --data "$payload" \
+            "$DISCORD_WEBHOOK_URL"

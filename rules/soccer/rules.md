@@ -1,0 +1,17 @@
+# Soccer Rules
+
+## Weapons
+
+- [General weapon rules](weapons/rules.md)
+- [Ballistic weapons](weapons/ballistic.md)
+- [Special weapons](weapons/special.md)
+- [Explosive weapons](weapons/explosive.md)
+
+## Gameplay
+
+- [Ball control](gameplay/ball-control.md)
+- [Respawning and resets](gameplay/respawning.md)
+
+## Penalties
+
+- [Penalty rules](penalties/penalty.md)
