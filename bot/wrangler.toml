@@ -1,0 +1,7 @@
+name = "trailmakers-hovercraft-league-bot"
+main = "src/entry.py"
+compatibility_date = "2026-10-11"
+compatibility_flags = ["python_workers"]
+
+[observability]
+enabled = true

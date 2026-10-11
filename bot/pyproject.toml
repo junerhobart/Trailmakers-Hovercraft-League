@@ -1,0 +1,13 @@
+[project]
+name = "trailmakers-hovercraft-league-bot"
+version = "0.1.0"
+description = "Discord interactions bot for the Trailmakers Hovercraft League"
+requires-python = ">=3.13"
+dependencies = [
+    "workers-runtime-sdk>=1.9.1,<2",
+]
+
+[dependency-groups]
+dev = [
+    "workers-py>=1.17.2,<2",
+]

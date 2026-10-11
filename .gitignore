@@ -1,2 +1,12 @@
 .vscode/
 .DS_Store
+.dev.vars
+.venv/
+.venv-workers/
+.wrangler/
+__pycache__/
+*.py[cod]
+bot/src/vendor/
+bot/runtime/
+python_modules/
+.env
