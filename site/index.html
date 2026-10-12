@@ -3,21 +3,37 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Hovercraft Soccer League Rules</title>
+    <title>Rules | Trailmakers Hovercraft League</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
   </head>
   <body>
+    <a class="skip-link" href="#rules">Skip to rules</a>
+
     <aside class="sidebar">
+      <a class="brand" href="#top" aria-label="Trailmakers Hovercraft League home">
+        <img src="assets/league-logo.png" alt="Trailmakers Hovercraft League">
+      </a>
+
       <nav aria-label="Rule categories">
         {{NAVIGATION}}
       </nav>
+
+      <div class="sidebar-footer">
+        <a class="discord-link" href="https://discord.gg/emTsXD7dct" target="_blank" rel="noopener noreferrer">Join Discord</a>
+      </div>
     </aside>
 
-    <main id="top">
-      <h1>Hovercraft Soccer League Rules</h1>
+    <main id="rules">
+      <header class="intro" id="top">
+        <div class="intro-content">
+          <h1>Rules</h1>
+          <a class="primary-link" href="https://discord.gg/emTsXD7dct" target="_blank" rel="noopener noreferrer">Join the Discord server</a>
+        </div>
+      </header>
+
       {{RULES}}
     </main>
   </body>

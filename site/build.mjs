@@ -1,4 +1,4 @@
-import { copyFile, mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { copyFile, cp, mkdir, readFile, readdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -15,6 +15,7 @@ const escapeHtml = (value) => value
   .replaceAll("'", "&#039;");
 
 const renderInline = (value) => escapeHtml(value)
+  .replace(/\[([^\]]+)\]\((https:\/\/[^\s)]+)\)/g, '<a href="$2">$1</a>')
   .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
   .replace(/`(.+?)`/g, "<code>$1</code>");
 
@@ -61,7 +62,7 @@ function renderMarkdown(markdown) {
   return output.join("\n");
 }
 
-const categoryOrder = ["build", "gameplay", "weapons", "penalties"];
+const categoryOrder = ["build", "gameplay", "weapons", "penalties", "community"];
 const entries = await readdir(rulesDirectory, { withFileTypes: true });
 const categories = entries
   .filter((entry) => entry.isDirectory())
@@ -104,7 +105,7 @@ for (const category of categories) {
     .join(" ");
   const rules = await Promise.all(files.map(async (file) => {
     const markdown = await readFile(path.join(categoryDirectory, file), "utf8");
-    return renderMarkdown(markdown);
+    return `<article class="rule-group">\n${renderMarkdown(markdown)}\n</article>`;
   }));
 
   navigation.push(`<a href="#${id}">${escapeHtml(label)}</a>`);
@@ -123,3 +124,4 @@ const page = template
 await mkdir(outputDirectory, { recursive: true });
 await writeFile(path.join(outputDirectory, "index.html"), page);
 await copyFile(path.join(siteDirectory, "styles.css"), path.join(outputDirectory, "styles.css"));
+await cp(path.join(siteDirectory, "assets"), path.join(outputDirectory, "assets"), { recursive: true });

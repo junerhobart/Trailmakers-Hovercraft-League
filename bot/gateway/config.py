@@ -11,6 +11,9 @@ JOIN_TO_CREATE_CHANNEL_ID = 1558843199391277108
 TEMP_VOICE_CATEGORY_ID = 1558516799891308614
 DEFAULT_VOICE_MEMBERS = 5
 MAX_VOICE_MEMBERS = 99
+DEFAULT_RATINGS_URL = (
+    "https://trailmakers-hovercraft-league-bot.june-hobart.workers.dev"
+)
 
 
 def _load_env_file(path: Path) -> None:
@@ -41,6 +44,7 @@ class Config:
     client_id: int
     match_result_file: Path
     match_webhook_url: str | None
+    ratings_url: str
 
     @classmethod
     def from_environment(cls) -> "Config":
@@ -61,4 +65,7 @@ class Config:
             client_id=int(client_id),
             match_result_file=match_result_file,
             match_webhook_url=os.environ.get("MATCH_RESULTS_DISCORD_WEBHOOK_URL"),
+            ratings_url=os.environ.get(
+                "HSL_RATINGS_URL", DEFAULT_RATINGS_URL
+            ).rstrip("/"),
         )

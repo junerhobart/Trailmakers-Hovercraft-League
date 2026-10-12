@@ -20,3 +20,7 @@
 ## Penalties
 
 - [Penalty rules](penalties/penalty.md)
+
+## Community
+
+- [Discord server](https://discord.gg/emTsXD7dct)

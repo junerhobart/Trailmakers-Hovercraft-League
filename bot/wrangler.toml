@@ -3,5 +3,10 @@ main = "src/entry.py"
 compatibility_date = "2026-10-11"
 compatibility_flags = ["python_workers"]
 
+[[d1_databases]]
+binding = "DB"
+database_name = "trailmakers-hovercraft-league-ratings"
+database_id = "ac6ec6ee-d537-4939-b895-93ad6c381639"
+
 [observability]
 enabled = true

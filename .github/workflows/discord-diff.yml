@@ -5,7 +5,6 @@ on:
     branches: [main]
     paths:
       - "rules/**"
-  workflow_dispatch:
 
 permissions:
   contents: read
@@ -21,35 +20,34 @@ jobs:
 
       - name: Send diff
         env:
-          EVENT_NAME: ${{ github.event_name }}
           BEFORE: ${{ github.event.before }}
           AFTER: ${{ github.sha }}
           REPOSITORY: ${{ github.repository }}
           SERVER_URL: ${{ github.server_url }}
+          DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
           DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          RULE_CHANNEL_ID: "1558517278260199445"
         run: |
           set -euo pipefail
 
-          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
-            message_sha="$(git log -1 --format=%H -- rules/)"
-            commit_title="$(git log -1 --format=%s "$message_sha")"
-            diff="$(git show --format= --unified=1 "$message_sha" -- rules/ || true)"
-          elif [[ "$BEFORE" == "0000000000000000000000000000000000000000" ]]; then
-            message_sha="$AFTER"
-            commit_title="$(git log -1 --format=%s "$AFTER")"
-            diff="$(git show --format= --unified=1 "$AFTER" -- rules/ || true)"
+          if [[ "$BEFORE" == "0000000000000000000000000000000000000000" ]]; then
+            message_sha="$(git log -1 --format=%H "$AFTER" -- rules/)"
+            empty_tree="$(git hash-object -t tree /dev/null)"
+            diff="$(git diff --unified=1 "$empty_tree" "$AFTER" -- rules/ || true)"
           else
-            message_sha="$AFTER"
-            commit_title="$(git log -1 --format=%s "$AFTER")"
+            message_sha="$(git log -1 --format=%H "$BEFORE..$AFTER" -- rules/)"
             diff="$(git diff --unified=1 "$BEFORE" "$AFTER" -- rules/ || true)"
           fi
 
           if [[ -z "$diff" ]]; then
-            diff="No textual changes."
-          elif (( ${#diff} > 3600 )); then
+            exit 0
+          fi
+
+          if (( ${#diff} > 3600 )); then
             diff="${diff:0:3575}"$'\n… diff truncated'
           fi
 
+          commit_title="$(git log -1 --format=%s "$message_sha")"
           commit_title="${commit_title:0:120}"
           commit_url="$SERVER_URL/$REPOSITORY/commit/$message_sha"
           short_sha="${message_sha:0:7}"
@@ -61,6 +59,21 @@ jobs:
             --arg description "$description" \
             '{embeds: [{title: $title, url: $url, description: $description}], allowed_mentions: {parse: []}}')"
 
+          if [[ -n "${DISCORD_TOKEN:-}" ]] && curl --fail --silent --show-error \
+            --request POST \
+            --header "Authorization: Bot $DISCORD_TOKEN" \
+            --header "Content-Type: application/json" \
+            --data "$payload" \
+            "https://discord.com/api/v10/channels/$RULE_CHANNEL_ID/messages"; then
+            exit 0
+          fi
+
+          if [[ -z "${DISCORD_WEBHOOK_URL:-}" ]]; then
+            echo "Bot delivery failed and DISCORD_WEBHOOK_URL is not configured." >&2
+            exit 1
+          fi
+
+          echo "Bot delivery failed; using the webhook backup." >&2
           curl --fail --silent --show-error \
             --header "Content-Type: application/json" \
             --data "$payload" \

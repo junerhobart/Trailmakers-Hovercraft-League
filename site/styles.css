@@ -1,8 +1,14 @@
 :root {
   color-scheme: dark;
-  font-family: "Inter", system-ui, sans-serif;
-  background: #111214;
-  color: #e8e8ea;
+  font-family: "Inter", system-ui, -apple-system, sans-serif;
+  background: #000000;
+  color: #f4f4f4;
+  --background: #000000;
+  --border: #262626;
+  --text: #f4f4f4;
+  --muted: #a8a8a8;
+  --yellow: #ffc800;
+  --blue: #35b5ee;
 }
 
 * {
@@ -11,123 +17,325 @@
 
 html {
   scroll-behavior: smooth;
+  background: var(--background);
 }
 
 body {
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr);
+  grid-template-columns: 240px minmax(0, 1fr);
   min-height: 100vh;
   margin: 0;
-  background: #111214;
-  color: #e8e8ea;
-  line-height: 1.6;
+  background: var(--background);
+  color: var(--text);
+  line-height: 1.65;
+}
+
+img {
+  display: block;
+  max-width: 100%;
 }
 
 a {
-  color: inherit;
+  color: var(--blue);
+  text-underline-offset: 0.2em;
+}
+
+a:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+}
+
+.skip-link {
+  position: fixed;
+  z-index: 10;
+  top: 12px;
+  left: 12px;
+  padding: 8px 12px;
+  background: #ffffff;
+  color: #000000;
+  font-weight: 700;
+  text-decoration: none;
+  transform: translateY(-180%);
+}
+
+.skip-link:focus {
+  transform: translateY(0);
 }
 
 .sidebar {
   position: sticky;
   top: 0;
+  display: flex;
+  flex-direction: column;
   height: 100vh;
-  padding: 24px;
-  border-right: 1px solid #2b2d31;
-  background: #17181b;
+  padding: 30px 22px 24px;
+  border-right: 1px solid var(--border);
+  background: var(--background);
+}
+
+.brand {
+  display: block;
+  width: 190px;
+  max-width: 100%;
+  aspect-ratio: 2 / 1;
+  margin: 0 auto;
+  overflow: hidden;
+}
+
+.brand img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 nav {
   display: grid;
-  gap: 4px;
+  gap: 2px;
+  margin-top: 32px;
 }
 
 nav a {
   padding: 8px 10px;
-  border-radius: 6px;
-  color: #a7a9ae;
+  color: #b9b9b9;
+  font-size: 0.88rem;
+  font-weight: 600;
   text-decoration: none;
 }
 
 nav a:hover,
 nav a:focus-visible {
-  background: #24262b;
+  background: #0d0d0d;
   color: #ffffff;
 }
 
-nav a:focus-visible {
-  outline: 2px solid #879cff;
-  outline-offset: 2px;
+.sidebar-footer {
+  margin-top: auto;
+}
+
+.discord-link,
+.primary-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 9px 14px;
+  border-radius: 3px;
+  background: var(--yellow);
+  color: #000000;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.discord-link {
+  width: 100%;
+}
+
+.discord-link:hover,
+.primary-link:hover {
+  background: #ffda3d;
 }
 
 main {
-  width: min(100%, 800px);
-  padding: 64px 48px 100px;
+  width: min(100%, 860px);
+  min-width: 0;
+  padding: 72px 64px 100px;
+}
+
+.intro {
+  max-width: 660px;
+  padding-bottom: 58px;
+  border-bottom: 1px solid var(--border);
 }
 
 h1 {
-  margin: 0 0 64px;
-  font-size: clamp(2rem, 5vw, 3.5rem);
-  line-height: 1.1;
+  margin: 0;
+  color: #ffffff;
+  font-size: clamp(2.8rem, 6vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 1;
 }
 
-h2 {
-  padding-bottom: 10px;
-  border-bottom: 1px solid #2b2d31;
-  font-size: 1.6rem;
-}
-
-h3 {
-  margin-top: 32px;
-  margin-bottom: 8px;
-}
-
-p,
-ul {
-  color: #c4c5c9;
+.primary-link {
+  margin-top: 24px;
 }
 
 section {
-  margin-top: 64px;
+  margin-top: 66px;
   scroll-margin-top: 24px;
 }
 
-li + li {
-  margin-top: 6px;
+h2 {
+  margin: 0 0 30px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+  color: #ffffff;
+  font-size: 1.6rem;
+  font-weight: 750;
+  letter-spacing: -0.025em;
 }
 
-@media (max-width: 700px) {
+.rule-group {
+  max-width: 700px;
+}
+
+.rule-group + .rule-group {
+  margin-top: 34px;
+  padding-top: 34px;
+  border-top: 1px solid #1c1c1c;
+}
+
+.rule-group > :first-child {
+  margin-top: 0;
+}
+
+.rule-group > :last-child {
+  margin-bottom: 0;
+}
+
+h3,
+h4 {
+  margin: 0 0 10px;
+  color: #ededed;
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.rule-group h3:not(:first-child),
+.rule-group h4:not(:first-child) {
+  margin-top: 26px;
+}
+
+p,
+ul,
+ol {
+  color: var(--muted);
+}
+
+p {
+  margin: 0 0 18px;
+}
+
+ul,
+ol {
+  margin: 0;
+  padding-left: 1.2rem;
+}
+
+li + li {
+  margin-top: 7px;
+}
+
+li::marker {
+  color: var(--blue);
+}
+
+strong {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+code {
+  padding: 0.12em 0.35em;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  color: #ffffff;
+  font: 0.9em ui-monospace, "SFMono-Regular", Consolas, monospace;
+}
+
+@media (max-width: 760px) {
   body {
     display: block;
   }
 
   .sidebar {
-    z-index: 1;
+    z-index: 5;
+    display: grid;
+    grid-template-areas:
+      "brand actions"
+      "nav nav";
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    width: 100%;
     height: auto;
-    padding: 14px 18px;
+    padding: 10px 16px 9px;
+    overflow: hidden;
     border-right: 0;
-    border-bottom: 1px solid #2b2d31;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .brand {
+    grid-area: brand;
+    width: 148px;
+    margin: 0;
   }
 
   nav {
+    grid-area: nav;
     display: flex;
+    gap: 2px;
+    margin-top: 8px;
     overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  nav::-webkit-scrollbar {
+    display: none;
   }
 
   nav a {
-    padding: 6px 8px;
-    font-size: 0.85rem;
+    flex: 0 0 auto;
+    padding: 5px 8px;
+    font-size: 0.8rem;
+  }
+
+  .sidebar-footer {
+    grid-area: actions;
+    margin: 0;
+  }
+
+  .discord-link {
+    min-height: 34px;
+    padding: 6px 10px;
+    font-size: 0.72rem;
   }
 
   main {
-    padding: 40px 22px 80px;
+    width: 100%;
+    padding: 44px 22px 72px;
   }
 
-  h1 {
-    margin-bottom: 48px;
+  .intro {
+    padding-bottom: 48px;
   }
 
   section {
-    scroll-margin-top: 80px;
+    margin-top: 58px;
+    scroll-margin-top: 118px;
+  }
+
+  h2 {
+    font-size: 1.5rem;
+  }
+
+}
+
+@media (max-width: 430px) {
+  .brand {
+    width: 126px;
+  }
+
+  .discord-link {
+    font-size: 0.66rem;
+  }
+
+  main {
+    padding-inline: 18px;
+  }
+
+  h1 {
+    font-size: 2.6rem;
   }
 }
 

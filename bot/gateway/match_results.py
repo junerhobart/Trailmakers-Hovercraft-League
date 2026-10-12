@@ -1,8 +1,14 @@
 import asyncio
 from dataclasses import dataclass
+from datetime import datetime, timezone
+import hashlib
+import hmac
 import json
 import logging
 from pathlib import Path
+import time
+from urllib.error import HTTPError, URLError
+from urllib.request import Request, urlopen
 
 import discord
 
@@ -78,11 +84,15 @@ class MatchResultRelay:
         channel_id: int,
         result_file: Path,
         webhook_url: str | None,
+        ratings_url: str,
+        ratings_secret: str,
     ) -> None:
         self.client = client
         self.channel_id = channel_id
         self.result_file = result_file
         self.webhook_url = webhook_url
+        self.ratings_url = ratings_url
+        self.ratings_secret = ratings_secret
         self.stopping = False
         self.rejected_result: str | None = None
 
@@ -100,6 +110,7 @@ class MatchResultRelay:
         if not self.result_file.is_file():
             return
 
+        file_stat = await asyncio.to_thread(self.result_file.stat)
         raw = await asyncio.to_thread(self.result_file.read_text, encoding="utf-8")
         if raw == self.rejected_result:
             return
@@ -112,6 +123,10 @@ class MatchResultRelay:
         self.rejected_result = None
         content = format_match_result(result)
 
+        delivered = await self._submit_rating(result, raw, file_stat.st_mtime_ns)
+        if not delivered:
+            return
+
         delivered = await self._send_with_bot(content)
         if not delivered:
             delivered = await self._send_with_webhook(content)
@@ -122,6 +137,60 @@ class MatchResultRelay:
         if current == raw:
             sent_file = self.result_file.with_suffix(self.result_file.suffix + ".sent")
             await asyncio.to_thread(self.result_file.replace, sent_file)
+
+    async def _submit_rating(
+        self,
+        result: MatchResult,
+        raw: str,
+        modified_at_ns: int,
+    ) -> bool:
+        match_id = hashlib.sha256(
+            f"{modified_at_ns}\n{raw}".encode("utf-8")
+        ).hexdigest()[:32]
+        payload = {
+            "version": 1,
+            "matchId": match_id,
+            "official": True,
+            "winner": result.winner,
+            "redPlayers": list(result.red_players),
+            "bluePlayers": list(result.blue_players),
+            "playedAt": datetime.fromtimestamp(
+                modified_at_ns / 1_000_000_000,
+                timezone.utc,
+            ).isoformat(),
+        }
+        body = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+        timestamp = str(int(time.time()))
+        signature = hmac.new(
+            self.ratings_secret.encode("utf-8"),
+            timestamp.encode("utf-8") + b"\n" + body,
+            hashlib.sha256,
+        ).hexdigest()
+        request = Request(
+            f"{self.ratings_url}/matches",
+            data=body,
+            method="POST",
+            headers={
+                "content-type": "application/json; charset=utf-8",
+                "x-hsl-timestamp": timestamp,
+                "x-hsl-signature": signature,
+            },
+        )
+
+        def submit() -> None:
+            with urlopen(request, timeout=15) as response:
+                if response.status < 200 or response.status >= 300:
+                    raise RuntimeError(
+                        f"Ratings service returned HTTP {response.status}."
+                    )
+                response.read()
+
+        try:
+            await asyncio.to_thread(submit)
+            return True
+        except (HTTPError, URLError, TimeoutError, RuntimeError):
+            LOGGER.exception("Ratings service rejected the match result.")
+            return False
 
     async def _send_with_bot(self, content: str) -> bool:
         try:

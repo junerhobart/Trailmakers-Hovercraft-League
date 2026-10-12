@@ -32,6 +32,8 @@ class LeagueBot(discord.Client):
             MATCH_CHANNEL_ID,
             config.match_result_file,
             config.match_webhook_url,
+            config.ratings_url,
+            config.token,
         )
         self.match_result_task: asyncio.Task | None = None
 
